@@ -1,0 +1,23 @@
+https://www.wolfe.id.au/2020/03/10/starting-a-go-project/
+https://medium.com/@ankurraina/go-declared-and-not-used-fa5104a78270
+https://stackoverflow.com/questions/52192069/how-can-i-type-an-array-of-mixed-types-in-golang
+https://www.golangprograms.com/go-language/interface.html
+https://stackoverflow.com/questions/12753805/type-converting-slices-of-interfaces
+
+
+https://astaxie.gitbooks.io/build-web-application-with-golang/en/
+
+https://medium.com/@thedevsaddam/easy-way-to-render-html-in-go-34575f858026
+
+https://stackoverflow.com/questions/25377637/datatables-cannot-read-property-mdata-of-undefined
+
+	primes := [6]int {2, 3, 5, 7, 11, 13}
+  mixed := []interface{} {"foo", 10, primes }
+  //fmt.Println(mixed...)
+
+  test := map[string]interface{} {
+    "omar":mixed, // mixed[0]
+  }
+
+  fmt.Println(test["omar"])
+
