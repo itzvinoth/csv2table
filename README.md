@@ -1,5 +1,8 @@
 # csv2table
 
+## Run command 
+`csv2table -csv=goog.csv --serve` 
+
 
 ## Usage 
 ```
