@@ -10,6 +10,7 @@ import (
 	"html/template"
 	"net/http"
 	"io/ioutil"
+	"strconv"
 	// "reflect"
 	// "bytes"
 	"github.com/mevinoth/csv2table/args"
@@ -18,16 +19,24 @@ import (
 type TableData struct {
 	Header []string
 	Rows [][]string
+	PageLength int
+	Pagination bool
+	Colvis bool
 }
 
 func main() {
 
+	var display_len int
 	// Get the arguments value from the termial
 	args := args.GetArgs()
 
 	input_file, _ := args["csv"].(string)
 	output_file, _ := args["save"].(string)
 	serve, _ := args["serve"].(bool)
+	dl, _ := args["dl"].(int)
+	pagination, _ := args["pagination"].(bool)
+	colvis, _ := args["colvis"].(bool)
+
 	// In case input file is present, we can serve the file in the browser
 	if (input_file != "empty") {
 		serve = true
@@ -35,6 +44,12 @@ func main() {
 	if (output_file != "empty") {
 		serve = false
 	}
+	if (dl != 0 && dl != -1) {
+		display_len = dl
+	} else {
+		display_len = -1
+	}
+	
 	// fmt.Println("reflect", reflect.TypeOf(serve).Kind())
 	
 	// Open the file
@@ -82,6 +97,9 @@ func main() {
 			data := TableData{
 				Header: csv_headers,
 				Rows: csv_rows,
+				PageLength: display_len,
+				Pagination: pagination,
+				Colvis: colvis,
 			}
 			tmpl.Execute(w, data)
 		})
@@ -101,24 +119,56 @@ func main() {
 		rowstr := string(jsonRowData)
 		jsonColData, err := json.Marshal(columnHeaders)
 		columndata := string(jsonColData)
+		displaylen := string(display_len)
+		spagination := strconv.FormatBool(pagination)
 
 		t := 
 `<!DOCTYPE html>
 <html lang="en">
 	<head>
-		<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-		<link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
-		<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js" type="text/javascript"></script>
+		<link href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.css" rel="stylesheet" />
+		<link href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.dataTables.css" rel="stylesheet" />
+		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+		<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+		<script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+		<script src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
+		<script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.print.min.js"></script>
 	</head>
 	<body>
-		<div>
-			<table id="table"></table>
+		<div class="container">
+			<table id="table" class="display nowrap" width="100%"></table>
 		</div>
 		<script>
 			$(document).ready( function () {
 				$("#table").DataTable({
+					dom: 'Bfrtip',
+					buttons: [{
+						extend: 'print',
+						title: 'Customized Print Title',
+						filename: 'customized_print_file_name'
+					}, {
+						extend: 'copy',
+						title: 'Customized Copy Title',
+						filename: 'customized_copy_file_name'
+					}, {
+						extend: 'pdf',
+						title: 'Customized PDF Title',
+						filename: 'customized_pdf_file_name'
+					}, {
+						extend: 'excel',
+						title: 'Customized EXCEL Title',
+						filename: 'customized_excel_file_name'
+					}, {
+						extend: 'csv',
+						filename: 'customized_csv_file_name'
+					}],
 					data: `+rowstr+`,
-					columns: `+columndata+`
+					columns: `+columndata+`,
+					pageLength: `+displaylen+`,
+					paging: `+spagination+`
 				})
 			});
 		</script>
