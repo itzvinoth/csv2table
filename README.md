@@ -3,6 +3,8 @@
 Command-line utility to convert CSV files to searchable and
 sortable HTML table. Supports large datasets and horizontal scrolling for large number of columns. This is just a copycat of ([csvtotable](https://github.com/vividvilla/csvtotable/)) utility written in python. Only for learning purpose &mdash; doing this utility library in golang.
 
+**Can't use for now.**
+
 ## Run command 
 `csv2table -csv=example.csv --serve` 
 
