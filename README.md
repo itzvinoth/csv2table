@@ -1,7 +1,7 @@
 # csv2table (Not finished)
 
-Command-line utility written in golang ([python](https://github.com/vividvilla/csvtotable/)) to convert CSV files to searchable and
-sortable HTML table. Supports large datasets and horizontal scrolling for large number of columns.
+Command-line utility to convert CSV files to searchable and
+sortable HTML table. Supports large datasets and horizontal scrolling for large number of columns. This is just the copycat of ([csvtotable](https://github.com/vividvilla/csvtotable/)) utility written in python. Only for learning purpose &mdash; doing this utility library in golang.
 
 ## Run command 
 `csv2table -csv=example.csv --serve` 
