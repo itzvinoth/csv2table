@@ -86,9 +86,7 @@ func main() {
 		}
 		i = i + 1
 	}
-	// Read from csv and get header and body contents
-
-
+	
 	// Render csv to HTML
 	if serve == true {
 		tmpl := template.Must(template.ParseFiles("table.html"))
