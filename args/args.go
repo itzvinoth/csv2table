@@ -47,14 +47,14 @@ func GetArgs () map[string]interface{} {
 	if help || h {
 		fmt.Fprintf(os.Stderr, 
 `
-	-h or --help              Used to print the list of arguments
-	--serve                   Open html output in a web browser.
-	-csv=table.csv            Mention csv file name.
-	-save=output.html         Mention html filename to save the output, .
-	-dl=25                    Number of rows to show by default. Defaults to -1 (show all rows).
-	-pagination=false         Enable/disable pagination. Enabled by default.
-	-colvis=true              Enable/disable pagination. Disabled by default.
-`)
+		-h or --help              Used to print the list of arguments
+		--serve                   Open html output in a web browser.
+		-csv=table.csv            Mention csv file name.
+		-save=output.html         Mention html filename to save the output, .
+		-dl=25                    Number of rows to show by default. Defaults to -1 (show all rows).
+		-pagination=false         Enable/disable pagination. Enabled by default.
+		-colvis=true              Enable/disable pagination. Disabled by default.
+	`)
 		os.Exit(2)
 	}
 

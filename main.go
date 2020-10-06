@@ -89,7 +89,7 @@ func main() {
 	
 	// Render csv to HTML
 	if serve == true {
-		tmpl := template.Must(template.ParseFiles("table.html"))
+		tmpl := template.Must(template.ParseFiles("templates/table.html"))
 		
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			data := TableData{
