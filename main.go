@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"io/ioutil"
 	"strconv"
-	// "reflect"
+	"reflect"
 	// "bytes"
 	"github.com/mevinoth/csv2table/args"
 )
@@ -26,40 +26,40 @@ type TableData struct {
 
 func main() {
 
-	var display_len int
+	var displayLength int
 	// Get the arguments value from the termial
 	args := args.GetArgs()
 
-	input_file, _ := args["csv"].(string)
-	output_file, _ := args["save"].(string)
+	inputCsvFile, _ := args["csv"].(string)
+	outputHtmlFile, _ := args["save"].(string)
 	serve, _ := args["serve"].(bool)
 	dl, _ := args["dl"].(int)
 	pagination, _ := args["pagination"].(bool)
 	colvis, _ := args["colvis"].(bool)
 
 	// In case input file is present, we can serve the file in the browser
-	if (input_file != "empty") {
+	if (inputCsvFile != "empty") {
 		serve = true
 	}
-	if (output_file != "empty") {
+	if (outputHtmlFile != "empty") {
 		serve = false
 	}
 	if (dl != 0 && dl != -1) {
-		display_len = dl
+		displayLength = dl
 	} else {
-		display_len = -1
+		displayLength = -1
 	}
 	
 	// fmt.Println("reflect", reflect.TypeOf(serve).Kind())
 	
 	// Open the file
-	csvfile, err := os.Open(input_file)
+	csvfile, err := os.Open(inputCsvFile)
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
 	}
 
-	var csv_headers []string
-	var csv_rows [][]string
+	var csvHeaders []string
+	var csvRows [][]string
 
 	// index value 
 	i := 1
@@ -80,9 +80,9 @@ func main() {
 		}
 		// first row pushes to the csv headers, remaining pushes to the csv rows
 		if i == 1 {
-			csv_headers = record
+			csvHeaders = record
 		} else {
-			csv_rows = append(csv_rows, record)
+			csvRows = append(csvRows, record)
 		}
 		i = i + 1
 	}
@@ -93,9 +93,9 @@ func main() {
 		
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			data := TableData{
-				Header: csv_headers,
-				Rows: csv_rows,
-				PageLength: display_len,
+				Header: csvHeaders,
+				Rows: csvRows,
+				PageLength: displayLength,
 				Pagination: pagination,
 				Colvis: colvis,
 			}
@@ -103,22 +103,18 @@ func main() {
 		})
 		fmt.Println("Listening on  http://localhost:8080")
 		http.ListenAndServe(":8080", nil)
-	} else if output_file != "empty" {
+	} else if outputHtmlFile != "empty" {
 		var columnHeaders []map[string]string
 
-		for _, v := range csv_headers {
-			ch := make(map[string]string)
-			ch["title"] = v
-			columnHeaders = append(columnHeaders, ch)
+		for _, v := range csvHeaders {
+			colHeader := make(map[string]string)
+			colHeader["title"] = v
+			columnHeaders = append(columnHeaders, colHeader)
 		}
 		
 		// Marshal the map into a JSON string.
-		jsonRowData, err := json.Marshal(csv_rows)
-		rowstr := string(jsonRowData)
-		jsonColData, err := json.Marshal(columnHeaders)
-		columndata := string(jsonColData)
-		displaylen := string(display_len)
-		spagination := strconv.FormatBool(pagination)
+		jsonRowDataBytes, err := json.Marshal(csvRows)
+		jsonColDataBytes, err := json.Marshal(columnHeaders)
 
 		t := 
 `<!DOCTYPE html>
@@ -163,10 +159,10 @@ func main() {
 						extend: 'csv',
 						filename: 'customized_csv_file_name'
 					}],
-					data: `+rowstr+`,
-					columns: `+columndata+`,
-					pageLength: `+displaylen+`,
-					paging: `+spagination+`
+					data: `+string(jsonRowDataBytes)+`,
+					columns: `+string(jsonColDataBytes)+`,
+					pageLength: `+strconv.Itoa(displayLength)+`,
+					paging: `+strconv.FormatBool(pagination)+`
 				})
 			});
 		</script>
@@ -176,7 +172,7 @@ func main() {
 
 		html := []byte(t)
 
-		if err = ioutil.WriteFile(output_file, html, 0666); err != nil {
+		if err = ioutil.WriteFile(outputHtmlFile, html, 0666); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
